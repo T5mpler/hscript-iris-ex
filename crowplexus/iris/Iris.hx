@@ -209,6 +209,11 @@ class Iris {
 	var expr: Expr;
 
 	/**
+	 * The script class of the interpter.
+	 */
+	var scriptClass: AbstractScriptClass;
+
+	/**
 	 * Helper variable for the error string caused by a nulled interpreter.
 	**/
 	final interpErrStr: String = "Careful, the interpreter hasn't been initialized";
@@ -226,22 +231,27 @@ class Iris {
 	public function new(scriptCode: String, ?config: AutoIrisConfig): Void {
 		if (config == null)
 			config = new IrisConfig("Iris", true, true, []);
+
 		this.scriptCode = scriptCode;
+
 		this.config = IrisConfig.from(config);
 		this.config.name = fixScriptName(this.name);
 
 		parser = new ParserEx();
+
 		interp = new InterpEx();
 		interp.showPosOnLog = false;
+		interp.addModule(scriptCode);
 
 		parser.allowTypes = true;
 		parser.allowMetadata = true;
 		parser.allowJSON = true;
 
+		scriptClass = interp.createScriptClassInstance(this.config.name, this.config.args);
+
 		// set variables to the interpreter.
 		if (this.config.autoPreset)
 			preset();
-		// run the script.
 		if (this.config.autoRun)
 			execute();
 	}
@@ -356,12 +366,12 @@ class Iris {
 		var ny: Dynamic = interp.variables.get(fun); // function signature
 		var isFunction: Bool = false;
 		try {
-			isFunction = ny != null && Reflect.isFunction(ny);
+			isFunction = ny != null && scriptClass.listFunctions().exists(ny);
 			if (!isFunction)
 				throw 'Tried to call a non-function, for "$fun"';
 			// throw "Variable not found or not callable, for \"" + fun + "\"";
 
-			final ret = Reflect.callMethod(null, ny, args);
+			final ret = scriptClass.callFunction(ny, args);
 			return {funName: fun, signature: ny, returnValue: ret};
 		}
 		// @formatter:off
