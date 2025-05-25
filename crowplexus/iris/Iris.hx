@@ -196,7 +196,12 @@ class Iris {
 	/**
 	 * Current initialized script interpreter.
 	**/
-	var interp: InterpEx;
+	var interp(get, never): InterpEx;
+
+	function get_interp(): InterpEx {
+		@:privateAccess
+		return scriptClass?._interp ?? null;
+	}
 
 	/**
 	 * Current initialized script parser.
@@ -239,15 +244,15 @@ class Iris {
 
 		parser = new ParserEx();
 
-		interp = new InterpEx();
-		interp.showPosOnLog = false;
-		interp.addModule(scriptCode);
+		// Temporary interpter for writing in the module.
+		var _interp = new InterpEx();
+		_interp.addModule(scriptCode);
 
 		parser.allowTypes = true;
 		parser.allowMetadata = true;
 		parser.allowJSON = true;
 
-		scriptClass = interp.createScriptClassInstance(this.config.name, this.config.args);
+		scriptClass = _interp.createScriptClassInstance(this.config.name, this.config.args);
 
 		// set variables to the interpreter.
 		if (this.config.autoPreset)
@@ -409,7 +414,7 @@ class Iris {
 	public function destroy(): Void {
 		if (Iris.instances.exists(this.name))
 			Iris.instances.remove(this.name);
-		interp = null;
+		scriptClass = null;
 		parser = null;
 	}
 
