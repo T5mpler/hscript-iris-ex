@@ -196,12 +196,12 @@ class Iris {
 	/**
 	 * Current initialized script interpreter.
 	**/
-	var interp: Interp;
+	var interp: InterpEx;
 
 	/**
 	 * Current initialized script parser.
 	**/
-	var parser: Parser;
+	var parser: ParserEx;
 
 	/**
 	 * Current initialized script expression.
@@ -230,8 +230,8 @@ class Iris {
 		this.config = IrisConfig.from(config);
 		this.config.name = fixScriptName(this.name);
 
-		parser = new Parser();
-		interp = new Interp();
+		parser = new ParserEx();
+		interp = new InterpEx();
 		interp.showPosOnLog = false;
 
 		parser.allowTypes = true;
