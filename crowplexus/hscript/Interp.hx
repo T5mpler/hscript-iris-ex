@@ -404,8 +404,8 @@ class Interp {
 	}
 
 	public function getOrImportClass(name: String): Dynamic {
-		if (Iris.proxyImports.exists(name))
-			return Iris.proxyImports.get(name);
+		if (Iris.defaultImports.exists(name))
+			return Iris.getImport(name);
 		return Tools.getClass(name);
 	}
 
@@ -507,7 +507,7 @@ class Interp {
 				throw SReturn;
 			case EImport(v, as):
 				final aliasStr = (as != null ? " named " + as : ""); // for errors
-				if (Iris.blocklistImports.contains(v)) {
+				if (Iris.getImport(v) == null) {
 					error(ECustom("You cannot add a blacklisted import, for class " + v + aliasStr));
 					return null;
 				}
