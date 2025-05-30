@@ -1,5 +1,6 @@
 package crowplexus.hscript;
 
+import crowplexus.iris.Iris;
 import crowplexus.hscript.Expr.ModuleDecl;
 
 @:access(crowplexus.hscript.ScriptClass)
@@ -184,6 +185,13 @@ class InterpEx extends Interp {
 	public function registerModule(module: Array<ModuleDecl>) {
 		var pkg: Array<String> = null;
 		var imports: Map<String, Array<String>> = [];
+
+		for (imp in Iris.defaultImports.keys()) {
+			var classImport: Class<Dynamic> = Iris.getImport(imp);
+
+			imports.set(imp, Type.getClassName(classImport).split('.'));
+		}
+
 		for (decl in module) {
 			switch (decl) {
 				case DPackage(path):

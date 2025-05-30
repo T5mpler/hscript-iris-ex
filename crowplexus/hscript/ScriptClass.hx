@@ -10,6 +10,8 @@ enum Param {
 }
 
 class ScriptClass {
+	private static var scriptInterp: InterpEx = new InterpEx(null);
+
 	private var _c: ClassDeclEx;
 	private var _interp: InterpEx;
 
@@ -40,6 +42,18 @@ class ScriptClass {
 		}
 		name += _c.name;
 		return name;
+	}
+
+	public static function createScriptClass(name: String, ?args: Array<Dynamic>): AbstractScriptClass {
+		return scriptInterp.createScriptClassInstance(name, args);
+	}
+
+	public static function registerScriptClass(content: String) {
+		try {
+			scriptInterp.addModule(content);
+		} catch (e) {
+			trace('Could not add script content: ' + e.message);
+		}
 	}
 
 	private function superConstructor(arg0: Dynamic = Unused, arg1: Dynamic = Unused, arg2: Dynamic = Unused, arg3: Dynamic = Unused) {

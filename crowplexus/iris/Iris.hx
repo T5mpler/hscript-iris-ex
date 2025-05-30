@@ -73,27 +73,20 @@ class Iris {
 	];
 
 	/**
-	 * Contains Classes/Enums that cannot be accessed via HScript.
-	 *
-	 * you may find this useful if you want your project to be more secure.
-	**/
-	@:unreflective public static var blocklistImports: Array<String> = [];
-
-	/**
 	 * Contains proxies for classes. So they can be sandboxed or add extra functionality.
 	**/
-	@:unreflective public static var proxyImports: Map<String, Dynamic> = ["Type" => ProxyType];
+	@:unreflective public static var defaultImports: Map<String, Class<Dynamic>> = ["Type" => Type];
 
 	public static function addBlocklistImport(name: String): Void {
-		blocklistImports.push(name);
+		defaultImports.set(name, null);
 	}
 
-	public static function addProxyImport(name: String, value: Dynamic): Void {
-		proxyImports.set(name, value);
+	public static function addImport(name: String, value: Class<Dynamic>): Void {
+		defaultImports.set(name, value);
 	}
 
-	public static function getProxiedImport(name: String): Dynamic {
-		return proxyImports.get(name);
+	public static function getImport(name: String): Dynamic {
+		return defaultImports.get(name);
 	}
 
 	private static function getDefaultPos(name: String = "Iris"): haxe.PosInfos {
@@ -330,7 +323,7 @@ class Iris {
 		if (interp == null)
 			Iris.fatal("[Iris:get()]: " + interpErrStr + ", when trying to get variable \"" + field + "\", returning false...");
 		#end
-		return interp != null ? interp.variables.get(field) : false;
+		return interp != null ? interp.variables.get(field) : null;
 	}
 
 	/**
